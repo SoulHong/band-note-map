@@ -2108,13 +2108,46 @@ function midiShow(state, detail){
       : 'MIDI 사용이 거절됐어요. 주소창 왼쪽의 사이트 정보 아이콘 → 사이트 설정에서 ‘MIDI 장치’를 <b>허용</b>으로 바꾼 뒤 MIDI 버튼을 다시 눌러 주세요.',
     error:`MIDI를 여는 중 문제가 생겼어요${detail ? ` (${detail})` : ''}. 건반을 다시 꽂고 MIDI 버튼을 눌러 보세요.`,
   }[state];
+  if (typeof midiPorts === 'function') midiPorts();
+}
+const portErr = new Map();      // port id → why opening it failed (shown in the port list)
+function midiReport(){
+  const a = midi.access, rows = [];
+  const line = (kind, p) => `${kind} · ${p.name || '(이름 없음)'}${p.manufacturer ? ' · ' + p.manufacturer : ''} · ${p.state}/${p.connection}${portErr.has(p.id) ? ' · 열기 실패: ' + portErr.get(p.id) : ''}`;
+  if (a) { [...a.inputs.values()].forEach(p => rows.push(line('입력', p))); [...a.outputs.values()].forEach(p => rows.push(line('출력', p))); }
+  const nIn = a ? a.inputs.size : 0, nOut = a ? a.outputs.size : 0;
+  let hint = '';
+  if (!a) hint = '아직 Chrome의 MIDI 허용 전이에요. 위의 MIDI 버튼을 누르고 허용하세요.';
+  else if (!nIn && !nOut) hint = 'Chrome이 MIDI 장치를 하나도 못 찾았어요. 다른 앱(Logic 등)은 되는데 Chrome만 안 된다면: Chrome을 Cmd+Q로 완전히 종료했다가 다시 열고, 건반을 뺐다가 다시 꽂은 뒤 MIDI 버튼을 눌러 보세요. 그래도 같으면 이 목록을 복사해서 알려 주세요.';
+  else if (!nIn) hint = '출력 포트만 보이고 입력 포트가 없어요. 피아노가 보내는 신호의 입력 포트가 Chrome에 안 잡힌 거예요.';
+  else if (portErr.size) hint = '입력 포트는 있는데 열기에 실패했어요. 오류 이름을 알려 주세요.';
+  return { rows, nIn, nOut, hint };
+}
+function midiPorts(){
+  const r = midiReport();
+  $('#midiPortCount').textContent = `(입력 ${r.nIn} · 출력 ${r.nOut})`;
+  $('#midiPortList').innerHTML = (r.rows.length ? '<ul>' + r.rows.map(x => `<li>${x}</li>`).join('') + '</ul>' : '') + (r.hint ? `<p class="phint">${r.hint}</p>` : '');
+  return r;
+}
+function midiDiagText(){
+  const r = midiReport();
+  return ['[MIDI 진단]', `브라우저: ${(navigator.userAgent.match(/(Chrome|Edg|Safari)\/[\d.]+/g) || []).join(' ')}`, `플랫폼: ${navigator.platform} · https: ${isSecureContext}`,
+    `프레임 안: ${inFrame}`, `포트 입력 ${r.nIn} / 출력 ${r.nOut}`, ...r.rows, `상태: ${$('#midiIc').textContent}`, `${(($('#midiMon') || {}).textContent || '마지막 신호: -')}`, r.hint && `안내: ${r.hint}`].filter(Boolean).join('\n');
 }
 function midiBind(){
   const ins = [...midi.access.inputs.values()];
-  ins.forEach(inp => { if (inp.onmidimessage !== midiMessage) inp.onmidimessage = midiMessage; });   // assigning opens the port
+  ins.forEach(inp => {
+    if (inp.onmidimessage !== midiMessage) inp.onmidimessage = midiMessage;     // assigning opens the port…
+    if (inp.connection !== 'open' && inp.open) inp.open().then(() => { portErr.delete(inp.id); midiPorts(); }, e => {
+      portErr.set(inp.id, (e && e.name) || 'error');
+      if ([...midi.access.inputs.values()].every(p => portErr.has(p.id))) midiShow('error', (e && e.name) || 'open failed');   // not one input could be opened
+      midiPorts();
+    });   // …and open() says why when it can't
+  });
   // one keyboard often shows up as several ports on Windows ("SMK25", "MIDIIN2 (SMK25)", …): show it once
   midi.names = [...new Set(ins.filter(i => i.state === 'connected').map(i => (i.name || 'MIDI 건반').replace(/^MIDIIN\d+\s*\((.*)\)$/i, '$1').trim()))];
   midiShow(midi.names.length ? 'ready' : 'none');
+  midiPorts();
   if (midi.names.length) askToUnlock();
 }
 async function midiConnect(auto){
@@ -2132,6 +2165,18 @@ async function midiConnect(auto){
   }
 }
 $('#midiBtn').addEventListener('click', midiConnect);
+$('#midiRescan').addEventListener('click', async () => {
+  if (!midi.access) { midiConnect(); return; }
+  try { midi.access = await navigator.requestMIDIAccess({ sysex:false }); midi.access.onstatechange = midiBind; } catch (e) {}
+  [...midi.access.inputs.values()].forEach(i => { i.onmidimessage = null; });   // rebind from scratch
+  portErr.clear(); midiBind();
+});
+$('#midiCopy').addEventListener('click', async () => {
+  const t = midiDiagText(), box = $('#midiDiag'); box.value = t; box.hidden = false; box.select();
+  let ok = false; try { await navigator.clipboard.writeText(t); ok = true; } catch (e) {}
+  $('#midiCopy').textContent = ok ? '복사했어요 ✓' : '아래 글을 직접 복사하세요';
+  setTimeout(() => { $('#midiCopy').textContent = '진단 내용 복사'; }, 2500);
+});
 $('#pedalLearn').textContent = midi.pedalCC === 64 ? '페달 신호 찾기' : `페달 = CC ${midi.pedalCC}`;
 $('#pedalLearn').addEventListener('click', () => {
   midi.learn = !midi.learn;
