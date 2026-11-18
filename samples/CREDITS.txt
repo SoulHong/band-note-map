@@ -1,0 +1,51 @@
+Drum samples in this folder (and bundled in drumkit.js) come from
+VCSL — Versilian Community Sample Library by Versilian Studios / Sam Gossner
+https://github.com/sgossner/VCSL  — license: CC0 1.0 (public domain dedication)
+
+Processing: converted to mono, 32 kHz, 16-bit; leading silence trimmed; shortened with a fade-out; peak-normalized.
+
+file            source (VCSL path)
+kick_soft.wav   Membranophones/Struck Membranophones/Bass Drum 1/BDrumNew_hit_v5_rr1_Sum.wav
+kick_hard.wav   Membranophones/Struck Membranophones/Bass Drum 1/BDrumNew_hit_v7_rr1_Sum.wav
+snare_soft.wav  Membranophones/Struck Membranophones/Snare Drum, Modern 1/Snare2_HitSN_v3_rr1_Mid.wav
+snare_hard.wav  Membranophones/Struck Membranophones/Snare Drum, Modern 1/Snare2_HitSN_v9_rr1_Mid.wav
+side.wav        Membranophones/Struck Membranophones/Snare Drum, Modern 3/Snare4_Xstick_v2_rr1_Mid.wav
+hhc_soft.wav    Idiophones/Struck Idiophones/Hi-Hat Cymbal/HiHat_HitC_v2_rr1_Mid.wav
+hhc_hard.wav    Idiophones/Struck Idiophones/Hi-Hat Cymbal/HiHat_HitC_v4_rr1_Mid.wav
+hhp.wav         Idiophones/Struck Idiophones/Hi-Hat Cymbal/HiHat_Close_rr1_Mid.wav
+hho.wav         Idiophones/Struck Idiophones/Hi-Hat Cymbal/HiHat_HitO_rr1_Mid.wav
+tom_hi.wav      Membranophones/Struck Membranophones/Tom 1/Stick/TomH_HitS_v3_rr1_Mid.wav
+tom_lo.wav      Membranophones/Struck Membranophones/Tom 2/Stick/TomL_HitS_v3_rr1_Mid.wav
+crash.wav       Idiophones/Struck Idiophones/Suspended Cymbal 2/susCymb2_hit_f1.wav
+ride.wav        Idiophones/Struck Idiophones/Suspended Cymbal 1/susCymb1_hit_stick_mp1.wav
+bell.wav        Idiophones/Struck Idiophones/Suspended Cymbal 1/susCymb1_hit_bell_mf1.wav
+clap.wav        Idiophones/Struck Idiophones/Claps/Clap_rr1.wav
+cowbell.wav     Idiophones/Struck Idiophones/Cowbells/Cowbell1_Normal_v3_rr1_Mid.wav
+tamb.wav        Idiophones/Struck Idiophones/Tambourine 1/Tamb1_Hit_v2_rr1_Mid.wav
+
+------------------------------------------------------------------
+Grand piano (samples/piano/*.wav, bundled in pianokit.js)
+VCSL — Chordophones/Zithers/Grand Piano, Steinway B/NoSus  (CC0 1.0)
+Files JHPiano_NoSus_Close_{C3,E3,G#3,C4,E4,G#4,C5,E5}_{vl2,vl4}_rr1.wav
+Saved as <MIDI note>_s.wav (soft, vl2) and <MIDI note>_h.wav (loud, vl4); MIDI 48–76.
+Processing: mono, 32 kHz, 16-bit, trimmed to 2.2–3.6 s with fade-out, peak-normalized.
+
+Upright bass (samples/bass/*.wav, bundled in basskit.js)
+VSCO 2 Community Edition by Versilian Studios — https://github.com/sgossner/VSCO-2-CE  (CC0 1.0)
+Strings/Solo Contrabass/Pizz/BKCtbss_Pizz_{E0,F#0,G0,A#0,C1,D1,E1,F#1,G#1,A1,C#2,E2}_v1_rr1.wav  -> <MIDI>_s.wav
+Strings/Solo Contrabass/Pizz/BKCtbss_Pizz_{E0,G0,C1,E1}_v3_rr1.wav                              -> <MIDI>_h.wav
+(VSCO octave names follow the same convention as Logic: E0 = MIDI 28.)
+Processing: mono, 24 kHz, 16-bit, trimmed to ~1.4–1.9 s with fade-out, peak-normalized.
+
+Electric bass (samples/ebass/*.wav, bundled in ebasskit.js)
+FreePats "Finger Bass YR" / "Picked Bass YR", version 2019-09-30 — https://github.com/freepats/electric-bass-YR  (CC0 1.0)
+Recorded by Andrea Biasior from a Yamaha RBX bass guitar; edited for FreePats by roberto@zenvoid.org.
+samples/finger/{E..D#}.flac -> f28_s.wav … f39_s.wav (MIDI 28–39, fingered)
+samples/pick/{E..D#,E2}.flac -> p28_s.wav … p40_s.wav (MIDI 28–40, picked)
+Notes above these are re-pitched from the highest recording, as in FreePats' own SFZ mapping.
+Processing: mono, 24 kHz, 16-bit, trimmed to ~1.3–1.5 s with fade-out, peak-normalized.
+
+Grand piano, low and high range (samples/piano_ext/*.wav, bundled in pianoextkit.js; loaded only for 88-key playing)
+VCSL — Chordophones/Zithers/Grand Piano, Steinway B/NoSus  (CC0 1.0)
+Files JHPiano_NoSus_Close_{A#0,C1,E1,G#1,C2,E2,G#2,G#5,C6,E6,G#6,C7,E7,G#7}_{vl2,vl4}_rr1.wav -> <MIDI>_s.wav / <MIDI>_h.wav
+Processing: mono, 16-bit; low notes 24 kHz, 3.6 s; high notes 32 kHz, 1.0–2.4 s; fade-out, peak-normalized.
